@@ -16,7 +16,6 @@ class ROBOT:
 
         pyrosim.Prepare_To_Simulate(self.robotId)
         self.Prepare_To_Sense()
-        self.Prepare_To_Act()
 
     def Prepare_To_Sense(self): 
         for linkName in pyrosim.linkNamesToIndices:
@@ -26,27 +25,30 @@ class ROBOT:
         for sensor_i in self.sensors:
             self.sensors[sensor_i].Get_Value(loopIt)
 
-    def Prepare_To_Act(self):
-        for jointName in pyrosim.jointNamesToIndices:
-            self.motors[jointName] = MOTOR(jointName)
-            if (jointName == 'Torso_BackLeg'):
-                self.motors[jointName].frequency = self.motors[jointName].frequency / 2
+    #def Prepare_To_Act(self):
+        #for jointName in pyrosim.jointNamesToIndices:
+            #self.motors[jointName] = MOTOR(jointName)
 
     def Act(self, loopIt):
-        for joint_i in self.motors:
-            motorVal = self.motors[joint_i].Set_Value(loopIt)
-            pyrosim.Set_Motor_For_Joint(
+        for neuronName in self.nn.Get_Neuron_Names():
+
+            if self.nn.Is_Motor_Neuron(neuronName):
+                jointId = self.nn.Get_Motor_Neurons_Joint(neuronName)
+                desiredAngle = self.nn.Get_Value_Of(neuronName)
+
+                pyrosim.Set_Motor_For_Joint(
                     bodyIndex = self.robotId,
-                    jointName = self.motors[joint_i].jointName,
+                    jointName = jointId,
                     controlMode = p.POSITION_CONTROL,
-                    targetPosition = self.motors[joint_i].values[loopIt],
-                    maxForce = 15)
+                    targetPosition = desiredAngle,
+                    maxForce = 15)            
 
     def Think(self):
+        self.nn.Update()
         self.nn.Print()
 
     def Save_Values(self):
         for i in self.sensors:
             self.sensors[i].Save_Values()
-        for i in self.motors:
-            self.motors[i].Save_Values()
+        #for i in self.motors:
+            #self.motors[i].Save_Values()
