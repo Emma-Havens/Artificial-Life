@@ -1,3 +1,3 @@
 import numpy
 
-simulationLength = 1000
+simulationLength = 500

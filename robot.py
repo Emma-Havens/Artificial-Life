@@ -42,7 +42,7 @@ class ROBOT:
                     jointName = jointId,
                     controlMode = p.POSITION_CONTROL,
                     targetPosition = desiredAngle,
-                    maxForce = 15)            
+                    maxForce = 25)            
 
     def Think(self):
         self.nn.Update()
