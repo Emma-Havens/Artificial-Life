@@ -8,9 +8,15 @@ from world import WORLD
 
 class SIMULATION:
 
-    def __init__(self):
+    def __init__(self, connectionMode):
 
-        physicsClient = p.connect(p.GUI)
+        self.connectionMode = connectionMode
+
+        if (self.connectionMode == "DIRECT"):
+            physicsClient = p.connect(p.DIRECT)
+        else:
+            physicsClient = p.connect(p.GUI)
+
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
 
         p.setGravity(0,0,-9.8)
@@ -20,8 +26,9 @@ class SIMULATION:
 
     def Run(self):
         for i in range(c.simulationLength):
-            #print(i)
-            time.sleep(1/60)
+
+            if (self.connectionMode == "GUI"):
+                time.sleep(1/60)
             p.stepSimulation()
 
             self.robot.Sense(i)
@@ -35,6 +42,9 @@ class SIMULATION:
         for joint_i in self.robot.motors:
             #print(self.robot.motors[joint_i].values)
             pass
+
+    def GetFitness(self):
+        self.robot.Get_Fitness()
 
     def __del__(self):
         p.disconnect()

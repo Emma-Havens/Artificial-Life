@@ -1,3 +1,4 @@
 import numpy
 
-simulationLength = 500
+simulationLength = 300
+numOfGens = 10
