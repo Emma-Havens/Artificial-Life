@@ -10,6 +10,7 @@ import constants as c
 from simulation import SIMULATION
 
 DirectOrGUI = sys.argv[1]
-sim = SIMULATION(DirectOrGUI)
+solutionId = sys.argv[2]
+sim = SIMULATION(DirectOrGUI, solutionId)
 sim.Run()
 sim.GetFitness()

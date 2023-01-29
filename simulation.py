@@ -8,7 +8,7 @@ from world import WORLD
 
 class SIMULATION:
 
-    def __init__(self, connectionMode):
+    def __init__(self, connectionMode, solutionId):
 
         self.connectionMode = connectionMode
 
@@ -22,7 +22,7 @@ class SIMULATION:
         p.setGravity(0,0,-9.8)
 
         self.world = WORLD()
-        self.robot = ROBOT()
+        self.robot = ROBOT(solutionId)
 
     def Run(self):
         for i in range(c.simulationLength):

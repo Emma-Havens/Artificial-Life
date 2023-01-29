@@ -2,10 +2,12 @@ import numpy as np
 import pyrosim.pyrosim as pyrosim
 import os
 import random
+import time
 
 class SOLUTION:
 
-    def __init__(self):
+    def __init__(self, solutionId):
+        self.solutionId = solutionId
         self.weights = np.random.rand(3, 2) * 2 - 1
 
     def CreateWorld(self):
@@ -31,7 +33,7 @@ class SOLUTION:
         self.motorNeurons.append(idName)
 
     def GenerateBrain(self):
-        pyrosim.Start_NeuralNetwork("brain.nndf")
+        pyrosim.Start_NeuralNetwork("brain" + str(self.solutionId) + ".nndf")
 
         self.sensorNeurons = []
         self.motorNeurons = []
@@ -51,17 +53,25 @@ class SOLUTION:
 
         pyrosim.End()
 
-    def Evaluate(self, connectionModeStr):
+    def Wait_For_Simulation_To_End(self):
+        fitnessFileName = "fitness" + str(self.solutionId) + ".txt"
+        while not os.path.exists(fitnessFileName):
+            time.sleep(0.01)
+        f = open(fitnessFileName, "r")
+        self.fitness = float(f.read())
+        f.close()
+        os.system("rm fitness" + str(self.solutionId) + ".txt")
+
+    def Start_Simulation(self, connectionModeStr):
         self.CreateWorld()
         self.GenerateBody()
         self.GenerateBrain()
-        os.system("python simulate.py " + connectionModeStr)
-
-        f = open("fitness.txt", "r")
-        self.fitness = float(f.read())
-        f.close()
+        os.system("python simulate.py " + connectionModeStr + " " + str(self.solutionId) + " 2&>1 &")
 
     def Mutate(self):
         randomRow = random.randint(0, 2)
         randomCol = random.randint(0, 1)
         self.weights[randomRow][randomCol] = random.random() * 2 - 1
+
+    def Set_Id(self, newId):
+        self.solutionId = newId
