@@ -1,11 +1,13 @@
 import numpy
 
-simulationLength = 500
+simulationLength = 1000
 
 motorJointRange = .5
+gaitSpeed = 2
 
-numOfGens = 10
-populationSize = 10
+numOfGens = 1
+populationSize = 1
 
-numSensorNeurons = 4
-numMotorNeurons = 4
+numSensorNeurons = 8
+numMotorNeurons = 14
+numSynapse = 21

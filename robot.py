@@ -16,7 +16,7 @@ class ROBOT:
         self.solutionId = solutionId
         self.robotId = p.loadURDF("body.urdf")
         self.nn = NEURAL_NETWORK("brain" + str(self.solutionId) + ".nndf")
-        os.system("rm brain" + str(self.solutionId) + ".nndf")
+        #os.system("rm brain" + str(self.solutionId) + ".nndf")
 
         pyrosim.Prepare_To_Simulate(self.robotId)
         self.Prepare_To_Sense()
@@ -46,7 +46,7 @@ class ROBOT:
                     jointName = jointId,
                     controlMode = p.POSITION_CONTROL,
                     targetPosition = desiredAngle,
-                    maxForce = 25)            
+                    maxForce = 50)            
 
     def Think(self):
         self.nn.Update()
@@ -56,6 +56,7 @@ class ROBOT:
         basePositionAndOrientation = p.getBasePositionAndOrientation(self.robotId)
         basePosition = basePositionAndOrientation[0]
         xPosition = basePosition[0]
+        #zPosition = basePosition[2]
 
         f = open("tmp" + str(self.solutionId) + ".txt", "w")
         f.write(str(xPosition))
