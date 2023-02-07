@@ -1,6 +1,7 @@
 ﻿import pybullet as p
 import pybullet_data
 import time
+import logging
 
 import constants as c
 from robot import ROBOT
@@ -45,6 +46,9 @@ class SIMULATION:
 
     def GetFitness(self):
         self.robot.Get_Fitness()
+
+    def Save_Values(self):
+        self.robot.Save_Values()
 
     def __del__(self):
         p.disconnect()

@@ -2,6 +2,7 @@ from solution import SOLUTION
 import constants as c
 import copy
 import os
+import random
 
 class PARALLEL_HILL_CLIMBER:
 
@@ -38,15 +39,19 @@ class PARALLEL_HILL_CLIMBER:
 
     def Select(self):
         for i in self.parents:
-            if (self.children[i].fitness < self.parents[i].fitness):
+            if (self.children[i].fitness > self.parents[i].fitness):
                 self.parents[i] = self.children[i]
+
+    def Save_Random(self):
+        self.original = copy.deepcopy(self.parents[random.randint(0, c.populationSize - 1)])
 
     def Show_Best(self):
         bestParent = 0
         for i in self.parents:
-            if (self.parents[i].fitness < self.parents[bestParent].fitness):
+            if (self.parents[i].fitness > self.parents[bestParent].fitness):
                 bestParent = i
         self.parents[bestParent].Start_Simulation("GUI")
+        self.original.Start_Simulation("GUI")
 
     def Evaluate(self, solutions, connectionMode):
         for i in solutions:
@@ -63,6 +68,7 @@ class PARALLEL_HILL_CLIMBER:
 
     def Evolve(self):
         self.Evaluate(self.parents, "DIRECT")
+        self.Save_Random()
         for curGen in range(c.numOfGens):
             self.Evolve_For_One_Gen()
             

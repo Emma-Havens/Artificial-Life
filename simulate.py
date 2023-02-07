@@ -14,3 +14,4 @@ solutionId = sys.argv[2]
 sim = SIMULATION(DirectOrGUI, solutionId)
 sim.Run()
 sim.GetFitness()
+#sim.Save_Values()

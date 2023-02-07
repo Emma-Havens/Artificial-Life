@@ -14,10 +14,10 @@ class SOLUTION:
     def CreateWorld(self):
         pyrosim.Start_SDF("world.sdf")
 
-        #pyrosim.Send_Cube(name='FirstStair', pos=[-5.5, 0, .25] , size=[10, 10, .5])
-        #pyrosim.Send_Cube(name='SecondStair', pos=[-6, 0, .75] , size=[10, 10, .5])
-        #pyrosim.Send_Cube(name='ThirdStair', pos=[-6.5, 0, 1.325] , size=[10, 10, .75])
-        #pyrosim.Send_Cube(name='FourthStair', pos=[-7, 0, 2.075] , size=[10, 10, .75])
+        pyrosim.Send_Cube(name='FirstStair', pos=[-52, 0, .125] , size=[100, 100, .25])
+        pyrosim.Send_Cube(name='SecondStair', pos=[-55, 0, .375] , size=[100, 100, .25])
+        pyrosim.Send_Cube(name='ThirdStair', pos=[-58, 0, .75] , size=[100, 100, .5])
+        pyrosim.Send_Cube(name='FourthStair', pos=[-61, 0, 1.25] , size=[100, 100, .5])
 
         pyrosim.End()
 
@@ -147,21 +147,24 @@ class SOLUTION:
             time.sleep(0.01)
         f = open(fitnessFileName, "r")
 
-        #lines = f.readlines()
-        #zPos = lines[1]
-        #xPos = lines[0]
-        #self.fitness = float(xPos)
+        lines = f.readlines()
+        xPos = lines[0]
+        zPos = lines[1]
+        jumpTime = lines[2]
+        bodyOffGround = lines[3]
+        self.fitness = (float(xPos) * -1) * float(zPos) * float(bodyOffGround)
 
-        self.fitness = float(f.read())
+        #self.fitness = float(f.read()) * -1
 
         f.close()
         os.system("rm fitness" + str(self.solutionId) + ".txt")
 
     def Start_Simulation(self, connectionModeStr):
-        #self.CreateWorld()
+        self.CreateWorld()
         self.GenerateBody()
         self.GenerateBrain()
         os.system("python simulate.py " + connectionModeStr + " " + str(self.solutionId) + " 2&>1 &")
+        #os.system("python simulate.py " + connectionModeStr + " " + str(self.solutionId) + " &")
 
     def Mutate(self):
         randomIndex = random.randint(0, c.numSynapse - 1)

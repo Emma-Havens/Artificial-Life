@@ -4,7 +4,7 @@ class MASS_URDF:
 
     def __init__(self):
 
-        self.string =  '<mass value="30" />'
+        self.string =  '<mass value="1" />'
 
         self.depth = 3
 
