@@ -51,7 +51,7 @@ class PARALLEL_HILL_CLIMBER:
             if (self.parents[i].fitness > self.parents[bestParent].fitness):
                 bestParent = i
         self.parents[bestParent].Start_Simulation("GUI")
-        self.original.Start_Simulation("GUI")
+        #self.original.Start_Simulation("GUI")
 
     def Evaluate(self, solutions, connectionMode):
         for i in solutions:
@@ -67,8 +67,13 @@ class PARALLEL_HILL_CLIMBER:
         self.Select()
 
     def Evolve(self):
-        self.Evaluate(self.parents, "DIRECT")
+        self.Evaluate(self.parents, "GUI")
         self.Save_Random()
         for curGen in range(c.numOfGens):
             self.Evolve_For_One_Gen()
+
+    def Display(self):
+        for i in self.parents:
+            self.parents[i].Start_Simulation("GUI")
+            self.parents[i].Wait_For_Simulation_To_End()
             

@@ -17,13 +17,10 @@ class ROBOT:
         self.solutionId = solutionId
         self.robotId = p.loadURDF("body.urdf")
         self.nn = NEURAL_NETWORK("brain" + str(self.solutionId) + ".nndf")
-        os.system("rm brain" + str(self.solutionId) + ".nndf")
+        #os.system("rm brain" + str(self.solutionId) + ".nndf")
 
         pyrosim.Prepare_To_Simulate(self.robotId)
         self.Prepare_To_Sense()
-
-        self.LegSensors = ["FrontLeftLower", "FrontRightLower", "MidLeftLower", "MidRightLower"]
-        self.JumpTime = [ 0, 0, 0, 0]
 
     def Prepare_To_Sense(self): 
         for linkName in pyrosim.linkNamesToIndices:
@@ -31,15 +28,7 @@ class ROBOT:
 
     def Sense(self, loopIt):
         for sensor_i in self.sensors:
-            if (self.sensors[sensor_i].Is_Oscillatory_Signal()):
-                self.sensors[sensor_i].Get_Oscillation(loopIt)
-            else:
-                self.sensors[sensor_i].Get_Value(loopIt)
-
-        for i, leg in enumerate(self.LegSensors):
-            jump = self.sensors[leg].ComputeJumpTime(loopIt)
-            if (jump > self.JumpTime[i]):
-                self.JumpTime[i] = jump                
+            self.sensors[sensor_i].Get_Value(loopIt)
 
 
     def Act(self, loopIt):
@@ -55,7 +44,7 @@ class ROBOT:
                     jointName = jointId,
                     controlMode = p.POSITION_CONTROL,
                     targetPosition = desiredAngle,
-                    maxForce = 50)            
+                    maxForce = 100)
 
     def Think(self):
         self.nn.Update()
@@ -65,14 +54,9 @@ class ROBOT:
         basePositionAndOrientation = p.getBasePositionAndOrientation(self.robotId)
         basePosition = basePositionAndOrientation[0]
         xPosition = basePosition[0]
-        zPosition = basePosition[2]
-
-        meanJumpTime = np.sum(self.JumpTime) / 4
-
-        headOffGround = np.sum(self.sensors["Head"].sensorHistory) / self.sensors["Head"].sensorHistory.size
 
         f = open("tmp" + str(self.solutionId) + ".txt", "w")
-        f.write(str(xPosition) + "\n" + str(zPosition) + "\n" + str(meanJumpTime) + "\n" + str(headOffGround))
+        f.write(str(xPosition))
         f.close()
         os.system("mv tmp" + str(self.solutionId) + ".txt fitness" + str(self.solutionId) + ".txt")
 

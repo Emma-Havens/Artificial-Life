@@ -17,6 +17,7 @@ class SIMULATION:
             physicsClient = p.connect(p.DIRECT)
         else:
             physicsClient = p.connect(p.GUI)
+            p.configureDebugVisualizer(p.COV_ENABLE_GUI,0)
 
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
 
