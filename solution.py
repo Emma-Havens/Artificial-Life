@@ -6,6 +6,7 @@ import os
 import random
 import time
 import copy
+from link import LINK
 
 
 class SOLUTION:
@@ -15,7 +16,7 @@ class SOLUTION:
         self.numLinks = random.randint(2, 10)
         self.numSensors = random.randint(1, self.numLinks)
         self.weights = np.random.rand(self.numSensors * self.numLinks) * 2 - 1
-        self.maxLinkSize = 2
+        self.maxLinkSize = 1
 
         self.sensorArr = np.zeros(self.numLinks)
         for i in range(self.numSensors):
@@ -37,7 +38,9 @@ class SOLUTION:
 
     def MakeFirstLink(self, linkName):
         sizeArr = np.random.rand(3) * self.maxLinkSize
-        posArr = np.array([0, 0, self.maxLinkSize / 2])
+        #sizeArr = np.ones(3)
+        self.startingz = self.maxLinkSize * 2
+        posArr = np.array([0, 0, self.startingz])
         if self.sensorArr[0] == 1:
             color = COLOR.Green
         else:
@@ -46,44 +49,139 @@ class SOLUTION:
                           pos=[posArr[0], posArr[1], posArr[2]],
                           size=[sizeArr[0], sizeArr[1], sizeArr[2]],
                           color=color)
-        self.links[linkName] = (linkName, posArr, sizeArr)
-        self.lastKeyIndex = 0
+        self.links[linkName] = LINK(linkName, posArr, sizeArr, None, None, self.startingz)
         self.keyArr.append(linkName)
 
-    def MakeLinkAndJoint(self, linkName, jointAxis):
-        sizeArr = np.random.rand(3) * self.maxLinkSize
-        lastLink = self.links[self.keyArr[self.lastKeyIndex]]
+    def NoCollisions(self, potentialLink):
+        return True
 
-        posArr = copy.deepcopy(lastLink[1])
-        jointPosArr = copy.deepcopy(lastLink[1])
-        lastSizeArr = copy.deepcopy(lastLink[2])
+    def NoCollisions(self, potentialLink):
+        validLink = True
+        for link in self.links:
+            if (not potentialLink.NoCollision(self.links[link])):
+                validLink = False
+        return validLink
 
-        posArr[0] = sizeArr[0] / 2
-        jointPosArr[0] = lastSizeArr[0]
-        if self.lastKeyIndex == 0:
-            jointPosArr[0] = lastSizeArr[0] / 2
-            posArr[2] = 0
+    def MakeJointAxis(self, jointAxis):
+        if (jointAxis == 0):
+            return '1 0 0'
+        elif (jointAxis == 1):
+            return '0 1 0'
+        elif (jointAxis == 2):
+            return '0 0 1'
 
-        if self.sensorArr[self.lastKeyIndex + 1] == 1:
+    def UpdateJointPosArr(self, lastSizeArr, lastPosArr, faceDir):
+        if (faceDir == 1):
+            return np.array([lastPosArr[0],
+                             lastPosArr[1],
+                             lastPosArr[2] + lastSizeArr[2] / 2])
+        elif (faceDir == 2):
+            return np.array([lastPosArr[0],
+                            lastPosArr[1] + lastSizeArr[1] / -2,
+                             lastPosArr[2]])
+        elif (faceDir == 3):
+            return np.array([lastPosArr[0],
+                             lastPosArr[1],
+                             lastPosArr[2] + lastSizeArr[2] / -2])
+        elif (faceDir == 4):
+            return np.array([lastPosArr[0],
+                             lastPosArr[1] + lastSizeArr[1] / 2,
+                             lastPosArr[2]])
+        elif (faceDir == 5):
+            return np.array([lastPosArr[0] + lastSizeArr[0] / 2,
+                             lastPosArr[1],
+                             lastPosArr[2]])
+
+    def MakeFirstJoint(self, lastSizeArr, faceDir):
+        if (faceDir == 1):
+            return np.array([0,
+                             0,
+                             (lastSizeArr[2] / 2) + self.startingz])
+        elif (faceDir == 2):
+            return np.array([0,
+                            lastSizeArr[1] / -2,
+                             self.startingz])
+        elif (faceDir == 3):
+            return np.array([0,
+                             0,
+                             (lastSizeArr[2] / -2) + self.startingz])
+        elif (faceDir == 4):
+            return np.array([0,
+                             lastSizeArr[1] / 2,
+                             self.startingz])
+        elif (faceDir == 5):
+            return np.array([lastSizeArr[0] / 2,
+                             0,
+                             self.startingz])
+
+    def UpdatePosArr(self, sizeArr, faceDir):
+        if (faceDir == 1):
+            return np.array([0,
+                             0,
+                             sizeArr[2] / 2])
+        elif (faceDir == 2):
+            return np.array([0,
+                            sizeArr[1] / -2,
+                             0])
+        elif (faceDir == 3):
+            return np.array([0,
+                             0,
+                             sizeArr[2] / -2])
+        elif (faceDir == 4):
+            return np.array([0,
+                             sizeArr[1] / 2,
+                             0])
+        elif (faceDir == 5):
+            return np.array([sizeArr[0] / 2,
+                             0,
+                             0])
+
+    def MakeLinkAndJoint(self, linkName):
+        validLink = False
+
+        lastLink = None
+        sizeArr = None
+        jointAxis = None
+        posArr = None
+        jointPosArr = None
+        potentialLink = None
+        while (not validLink):
+            sizeArr = np.random.rand(3) * self.maxLinkSize
+            #sizeArr = np.ones(3)
+            lastLink = self.links[self.keyArr[random.randint(0, len(self.links) - 1)]]
+            jointAxis = random.randint(0, 2)
+            faceDir = random.randint(1, 5)
+
+            lastSizeArr = copy.deepcopy(lastLink.sizeArr)
+
+            jointPosArr = self.UpdateJointPosArr(lastSizeArr, lastLink.posArr, faceDir)
+            posArr = self.UpdatePosArr(sizeArr, faceDir)
+            if (lastLink.prevLink == None):
+                jointPosArr = self.MakeFirstJoint(lastSizeArr, faceDir)
+
+            potentialLink = LINK(linkName, posArr, sizeArr, lastLink, faceDir)
+            if (self.NoCollisions(potentialLink)):
+                validLink = True
+
+        if self.sensorArr[len(self.links)] == 1:
             color = COLOR.Green
         else:
             color = COLOR.Cyan
 
-        jointName = lastLink[0] + '_' + linkName
+        jointName = lastLink.linkName + '_' + linkName
         pyrosim.Send_Joint(name=jointName,
-                           parent=lastLink[0],
+                           parent=lastLink.linkName,
                            child=linkName,
                            type='revolute',
                            position=[jointPosArr[0], jointPosArr[1], jointPosArr[2]],
-                           jointAxis=jointAxis)
+                           jointAxis=self.MakeJointAxis(jointAxis))
         self.joints.append(jointName)
         pyrosim.Send_Cube(name=linkName,
                           pos=[posArr[0], posArr[1], posArr[2]],
                           size=[sizeArr[0], sizeArr[1], sizeArr[2]],
                           color=color)
-        self.links[linkName] = (linkName, posArr, sizeArr)
+        self.links[linkName] = potentialLink
 
-        self.lastKeyIndex += 1
         self.keyArr.append(linkName)
 
     def GenerateBody(self):
@@ -98,7 +196,7 @@ class SOLUTION:
         linkName += 1
 
         for i in range(self.numLinks - 1):
-            self.MakeLinkAndJoint(str(linkName), '0 1 0')
+            self.MakeLinkAndJoint(str(linkName))
             linkName += 1
 
         pyrosim.End()
@@ -163,8 +261,8 @@ class SOLUTION:
         # self.CreateWorld()
         self.GenerateBody()
         self.GenerateBrain()
-        os.system("python simulate.py " + connectionModeStr + " " + str(self.solutionId) + " 2&>1 &")
-        #os.system("python simulate.py " + connectionModeStr + " " + str(self.solutionId) + " &")
+        #os.system("python simulate.py " + connectionModeStr + " " + str(self.solutionId) + " 2&>1 &")
+        os.system("python simulate.py " + connectionModeStr + " " + str(self.solutionId) + " &")
 
     def Mutate(self):
         randomIndex = random.randint(0, self.numSensors * self.numLinks - 1)

@@ -1,10 +1,10 @@
 import numpy
 
-simulationLength = 200
+simulationLength = 300
 
 motorJointRange = .4
 gaitSpeed = 3
 
 numOfGens = 1
-populationSize = 5
+populationSize = 8
 
