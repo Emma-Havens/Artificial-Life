@@ -4,17 +4,15 @@ Simulated using pybullet, robot resources from pyrosim. See r/ludobots for an in
 
 Project can easily be run a reproduced by running 'python search.py'
 
-Your repo should contain a README file with instructions for running the main file and a clear description/diagram explaining how* bodies and brains are generated. Define morphospace: What kind of body shapes and movements are possible? What kinds of brains are possible? Can a sensor on one side of the body affect a motor on the other side?
+**Links:** A 3D block, defined with size dimensions. The dimensions are randomly generated, each number between 0 and 1. There are a random number of links, between 2 and 10. All of these constants can be easily changed, but were selected for both breadth and clarity.
 
-Links: A 3D block, defined with size dimensions. The dimensions are randomly generated, each number between 0 and 1. There are a random number of links, between 2 and 10. All of these constants can be easily changed, but were selected for both breadth and clarity.
-
-Joints: Each 2 links have a joint between them with a planar degree of movement. Each joint is randomly assigned its degree of freedom.
+**Joints:** Each 2 links have a joint between them with a planar degree of movement. Each joint is randomly assigned its degree of freedom.
 
 ![IMG_442A251F0BFC-1](https://user-images.githubusercontent.com/71985604/220263527-a7164093-e6b8-43c5-8e9e-426a4ff38929.jpeg)
 
-Sensors and Motors: Sensors give signal as to whether the link is touching the ground or not. A random number of sensors (less than the random number of links) are placed at randomly selected positions and are indicated by green colored links. All links without sensors are colored cyan. All joints are motorized, and all sensors send inputs to all motors via synapses.
+**Sensors and Motors:** Sensors give signal as to whether the link is touching the ground or not. A random number of sensors (less than the random number of links) are placed at randomly selected positions and are indicated by green colored links. All links without sensors are colored cyan. All joints are motorized, and all sensors send inputs to all motors via synapses.
 
-The generated bodies are capable of filling 3D space. A link can be placed on any unoccupied face of another link, such that the space it occupies at beginning of simulation does not intersect with any other link. Links must be placed face to face; not face to edge or face to corner.
+**Morphospace:** The generated bodies are capable of filling 3D space. A link can be placed on any unoccupied face of another link, such that the space it occupies at beginning of simulation does not intersect with any other link. Links must be placed face to face; not face to edge or face to corner.
 
 ![IMG_E72A29580D31-1](https://user-images.githubusercontent.com/71985604/220263679-d1a81747-8e17-44a1-85d9-6b1edc6e1091.jpeg)
 
