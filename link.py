@@ -2,12 +2,14 @@ import numpy as np
 
 class LINK:
 
-    def __init__(self, linkName, posArr, sizeArr, prevLink=None, faceDir=None, startingz=None):
+    def __init__(self, linkName, posArr, sizeArr, jointAxis, prevLink=None, faceDir=None, startingz=None):
         self.linkName = linkName
         #this is wrt previous joint
         self.posArr = posArr
         self.sizeArr = sizeArr
+        self.jointAxis = jointAxis
         self.prevLink = prevLink
+        self.faceDir = faceDir
         if (prevLink == None):
             self.absPosArr = np.array([0, 0, startingz])
         else:

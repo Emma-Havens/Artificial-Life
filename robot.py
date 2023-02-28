@@ -1,6 +1,7 @@
 ﻿import pybullet as p
 import pyrosim.pyrosim as pyrosim
 import os
+import math
 import numpy as np
 import constants as c
 
@@ -15,7 +16,7 @@ class ROBOT:
         self.motors = dict()
 
         self.solutionId = solutionId
-        self.robotId = p.loadURDF("body.urdf")
+        self.robotId = p.loadURDF("body" + str(self.solutionId) + ".urdf")
         self.nn = NEURAL_NETWORK("brain" + str(self.solutionId) + ".nndf")
         #os.system("rm brain" + str(self.solutionId) + ".nndf")
 
@@ -54,9 +55,11 @@ class ROBOT:
         basePositionAndOrientation = p.getBasePositionAndOrientation(self.robotId)
         basePosition = basePositionAndOrientation[0]
         xPosition = basePosition[0]
+        yPosition = basePosition[1]
+        distTravel = math.sqrt(math.pow(xPosition, 2) + math.pow(yPosition, 2))
 
         f = open("tmp" + str(self.solutionId) + ".txt", "w")
-        f.write(str(xPosition))
+        f.write(str(distTravel))
         f.close()
         os.system("mv tmp" + str(self.solutionId) + ".txt fitness" + str(self.solutionId) + ".txt")
 
