@@ -16,3 +16,6 @@ Project can easily be run a reproduced by running 'python search.py'
 
 ![IMG_E72A29580D31-1](https://user-images.githubusercontent.com/71985604/220263679-d1a81747-8e17-44a1-85d9-6b1edc6e1091.jpeg)
 
+**Evolution:** Robot bodies can evolve by resizing their blocks. They cannot add, remove, or change the position of their blocks, but even simple resizing can result in drastic mobility differences. (Robot links are not meant to intersect, but there is currently a bug in the code that resets the link's positions after a link is resized, so the collision detector meant to prevent link intersection had to be turned off temporarily.)
+
+![IMG_3798E712A9FC-1](https://user-images.githubusercontent.com/71985604/221772024-1aa4af7c-f545-4130-8d61-9c1395ae4535.jpeg)
