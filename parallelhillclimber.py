@@ -5,16 +5,13 @@ import os
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 
 class PARALLEL_HILL_CLIMBER:
 
     def __init__(self):
         self.parents = dict()
         self.nextAvailableId = 0
-
-        os.system("rm brain*.nndf")
-        os.system("rm fitness*.txt")
-        os.system("rm body*.urdf")
 
         self.bestOfEachGen = np.zeros((c.populationSize, c.numOfGens + 1))
         self.curGen = 0
@@ -83,11 +80,15 @@ class PARALLEL_HILL_CLIMBER:
         self.LogGenFitness()
 
     def Evolve(self):
+        os.system("rm brain*.nndf")
+        os.system("rm fitness*.txt")
+        os.system("rm body*.urdf")
         self.Evaluate(self.parents, "DIRECT")
         #self.Save_Random()
         self.firstGen = copy.deepcopy((self.parents))
         self.LogGenFitness()
         for curGen in range(c.numOfGens):
+            print("Evolving generation " + str(curGen))
             self.Evolve_For_One_Gen()
 
     def Display(self):
@@ -98,6 +99,32 @@ class PARALLEL_HILL_CLIMBER:
             print(self.children[i].fitness)
             self.firstGen[i].Wait_For_Simulation_To_End()
             self.children[i].Wait_For_Simulation_To_End()
+
+    def PickleSim(self):
+        pickle.dump(self.firstGen, open("firstGen.p", "wb"))
+        pickle.dump(self.children, open("children.p", "wb"))
+        pickle.dump(self.bestOfEachGen, open("bestOfEachGen.p", "wb"))
+
+    def DisplayPickledSims(self):
+        #firstGen = pickle.load(open("firstGen.p", "rb"))
+        children = pickle.load(open("children.p", "rb"))
+        for i in children:
+            #firstGen[i].Start_Simulation("GUI")
+            #print(firstGen[i].fitness)
+            children[i].Start_Simulation("GUI")
+            print(children[i].fitness)
+            #firstGen[i].Wait_For_Simulation_To_End()
+            children[i].Wait_For_Simulation_To_End()
+
+    def DisplayPickledPlot(self):
+        bestOfEachGen = pickle.load(open("bestOfEachGen.p", "rb"))
+        for i in range(len(bestOfEachGen)):
+            label = "seed" + str(i)
+            plt.plot(bestOfEachGen[i], label=label)
+        plt.xlabel("Generation")
+        plt.ylabel("Fitness")
+        plt.legend()
+        plt.show()
 
     def ShowFitnessPlot(self):
         for i in range(len(self.bestOfEachGen)):
