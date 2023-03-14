@@ -15,6 +15,8 @@ class BODY:
         self.joints = list()
         self.keyArr = list()
 
+        self.ItThres = 20
+
 
     def GenerateBody(self):
         linkName = 0
@@ -28,6 +30,7 @@ class BODY:
 
     def RegenerateBody(self, linkIndexToChange):
         self.joints = list()
+        self.storedLinkIndexToChange = linkIndexToChange
         linktoChange = self.keyArr[linkIndexToChange]
         linkName = 0
 
@@ -48,11 +51,16 @@ class BODY:
     def NoCollisions(self, potentialLink, curIndex):
         validLink = True
         print('attempting to place ' + potentialLink.linkName)
-        for i in range(curIndex):
+        for i in range(len(self.links)):
             link = self.keyArr[i]
+            print('checking against ' + link)
             if (not potentialLink.NoCollision(self.links[link])):
-                validLink = False
-                print('collision with ' + str(link))
+                if (potentialLink.linkName != link):
+                    validLink = False
+                    print('collision with ' + str(link))
+                    print('potential link is size' + str(potentialLink.sizeArr))
+                    print(str(link) + ' is size ' + str(self.links[link].sizeArr))
+                #print('new link thinks it is size ' + str(potentialLink.prevLink.sizeArr))
         return validLink
 
     def NoCollisions(self, potentialLink, curIndex):
@@ -134,14 +142,28 @@ class BODY:
                              0])
 
     def MakeFirstLink(self, linkName, useExisting=False):
-        if useExisting == True:
-            sizeArr = self.links[self.keyArr[0]].sizeArr
-        else:
-            sizeArr = np.random.rand(3) * self.maxLinkSize
-            self.keyArr.append(linkName)
-            #sizeArr = np.ones(3)
-        self.startingz = self.maxLinkSize * 2
-        posArr = np.array([0, 0, self.startingz])
+        validLink = False
+        numIt = 0
+        sizeArr = None
+        posArr = None
+        potentialLink = None
+        while (not validLink):
+            numIt += 1
+            if (numIt > self.ItThres):
+                raise Exception("Infinite Loop")
+            if useExisting == True:
+                sizeArr = self.links[self.keyArr[0]].sizeArr
+            else:
+                sizeArr = np.random.rand(3) * self.maxLinkSize
+                if (len(self.keyArr) != self.numLinks):
+                    self.keyArr.append(linkName)
+                #sizeArr = np.ones(3)
+            self.startingz = self.maxLinkSize * 2
+            posArr = np.array([0, 0, self.startingz])
+            potentialLink = LINK(linkName, posArr, sizeArr, None, None, None, self.startingz)
+            if (self.NoCollisions(potentialLink, 0)):
+                validLink = True
+
         if self.sensorArr[0] == 1:
             color = COLOR.Green
         else:
@@ -150,10 +172,11 @@ class BODY:
                           pos=[posArr[0], posArr[1], posArr[2]],
                           size=[sizeArr[0], sizeArr[1], sizeArr[2]],
                           color=color)
-        self.links[linkName] = LINK(linkName, posArr, sizeArr, None, None, None, self.startingz)
+        self.links[linkName] = potentialLink
 
     def MakeLinkAndJoint(self, linkName, thisIndex, useExisting=False):
         validLink = False
+        numIt = 0
 
         lastLink = None
         sizeArr = None
@@ -162,6 +185,9 @@ class BODY:
         jointPosArr = None
         potentialLink = None
         while (not validLink):
+            numIt += 1
+            if (numIt > self.ItThres):
+                raise Exception("Infinite Loop")
             if useExisting == True:
                 #print('existing true')
                 thisLink = self.links[self.keyArr[thisIndex]]
@@ -172,7 +198,8 @@ class BODY:
                 lastLink = thisLink.prevLink
             else:
                 #print('existing false')
-                self.keyArr.append(linkName)
+                if (len(self.keyArr) != self.numLinks):
+                    self.keyArr.append(linkName)
                 sizeArr = np.random.rand(3) * self.maxLinkSize
                 #sizeArr = np.ones(3)
                 lastLink = self.links[self.keyArr[random.randint(0, thisIndex - 1)]]
